@@ -48,7 +48,7 @@ chord_of_minor(vii_major, [10, 2, 5]).
 chord_of_minor(vii_diminished, [11, 2, 5]).
 chord_of_minor(vii_diminished_seventh, [11, 2, 5, 8]).
 
-pivot_chord(Key1, Key2, pivot(chord(Key1, Name1), chord(Key2, Name2))) :-
+pivot_chord(Key1, Key2, pivot(chord(Key1, Name1), chord(Key2, Name2), Notes)) :-
     chord_of_key(Key1, Name1, Notes),
     chord_of_key(Key2, Name2, Notes).
 
@@ -149,13 +149,13 @@ trailing_pad([Pivot1, Pivot2|RemainingPivots], [Pivot1, Pad, Pivot2|RemainingPad
 trailing_pad([Pivot], [Pivot, Pad]) :-
     final_padding(Pivot, Pad).
 
-initial_padding(pivot(chord(Key, Chord), _), Pad) :-
+initial_padding(pivot(chord(Key, Chord), _, _), Pad) :-
     first_pad(Key, Chord, Pad).
 
-intermediate_padding(pivot(_, chord(Key, Chord1)), pivot(chord(Key, Chord2), _), Pad) :-
+intermediate_padding(pivot(_, chord(Key, Chord1), _), pivot(chord(Key, Chord2), _, _), Pad) :-
     inter_pad(Key, Chord1, Chord2, Pad).
 
-final_padding(pivot(_, chord(Key, Chord)), Pad) :-
+final_padding(pivot(_, chord(Key, Chord), _), Pad) :-
     final_pad(Key, Chord, Pad).
 
 first_pad(_, i_major, pad([])).
@@ -303,7 +303,7 @@ simplify_sequence([H|T], [S|U]) :-
 simplify(pad(Chords), SimplifiedChords) :-
     simplify_chords(Chords, SimplifiedChords).
 
-simplify(pivot(Chord, _), SimplifiedChord) :-
+simplify(pivot(Chord, _, _), SimplifiedChord) :-
     simplify_chord(Chord, SimplifiedChord).
 
 simplify_chords([], []).
