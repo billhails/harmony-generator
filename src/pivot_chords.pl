@@ -48,10 +48,6 @@ chord_of_c_minor(vii_major, [10, 2, 5]).
 chord_of_c_minor(vii_diminished, [11, 2, 5]).
 chord_of_c_minor(vii_diminished_seventh, [11, 2, 5, 8]).
 
-pivot_chord(Key1, Key2, pivot(chord(Key1, Rna1, Notes), chord(Key2, Rna2, Notes))) :-
-    chord_of_key(Key1, Rna1, Notes),
-    chord_of_key(Key2, Rna2, Notes).
-
 chord_of_key(key(Pitch, major), Rna, Notes) :- chord_of_major_key(Pitch, Rna, Notes).
 chord_of_key(key(Pitch, minor), Rna, Notes) :- chord_of_minor_key(Pitch, Rna, Notes).
 
@@ -80,6 +76,8 @@ note_names([], []).
 note_names([X|T], [Y|U]) :-
     note(X, Y),
     note_names(T, U).
+
+/** key_chain ********************/
 
 key_chain(Chain) :-
     key_chain([c, g, d, a, e, b, f_sh, c_sh, g_sh, e_fl, b_fl, f], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], Chain).
@@ -124,91 +122,126 @@ except(Key, [Key|T], U) :-
 except(Key, [X|T], [X|U]) :-
     except(Key, T, U).
 
-modulating_sequence(Sequence) :-
+/** modulating_sequence ********************/
+
+modulating_sequence(Sequence, UsedNotes) :-
     key_chain(Chain),
-    pivot_chords(Chain, Sequence).
+    pivot_chords(Chain, Sequence, []),
+    extract_notes(Sequence, UsedNotes).
 
-pivot_chords([Key1, Key2|RemainingChain], [Chord|RemainingChords]) :-
-    pivot_chord(Key1, Key2, Chord),
-    pivot_chords([Key2|RemainingChain], RemainingChords).
+pivot_chords([Key1, Key2|RemainingChain], [Chord|RemainingChords], UsedNotes) :-
+    pivot_chord(Key1, Key2, Chord, Notes),
+    \+ member(Notes, UsedNotes),
+    pivot_chords([Key2|RemainingChain], RemainingChords, [Notes|UsedNotes]).
 
-pivot_chords([_], []).
+pivot_chords([_], [], _).
+
+pivot_chord(Key1, Key2, pivot(chord(Key1, Rna1, Notes), chord(Key2, Rna2, Notes)), Notes) :-
+    chord_of_key(Key1, Rna1, Notes),
+    chord_of_key(Key2, Rna2, Notes).
+
+extract_notes([], []).
+
+extract_notes([pivot(chord(_, _, Notes), _)|RemainingPivots], [Notes|RemainingNotes]) :-
+    extract_notes(RemainingPivots, RemainingNotes).
+
+/** padded_sequence *************************/
 
 padded_sequence(PaddedSequence) :-
-    modulating_sequence(Sequence),
-    padded_modulating_sequence(Sequence, PaddedSequence).
+    modulating_sequence(Sequence, UsedNotes),
+    padded_modulating_sequence(Sequence, UsedNotes, PaddedSequence).
 
-padded_modulating_sequence([Pivot|RemainingPivots], [Pad, Pivot|RemainingPadded]) :-
-    initial_padding(Pivot, Pad),
-    trailing_pad([Pivot|RemainingPivots], [Pivot|RemainingPadded]).
+padded_modulating_sequence([Pivot|RemainingPivots], UsedNotes, [Pad, Pivot|RemainingPadded]) :-
+    initial_padding(Pivot, UsedNotes, Pad, ExtraUsedNotes),
+    append(UsedNotes, ExtraUsedNotes, AllUsedNotes),
+    trailing_pad([Pivot|RemainingPivots], AllUsedNotes, [Pivot|RemainingPadded]).
 
-trailing_pad([Pivot1, Pivot2|RemainingPivots], [Pivot1, Pad, Pivot2|RemainingPadding]) :-
-    intermediate_padding(Pivot1, Pivot2, Pad),
-    trailing_pad([Pivot2|RemainingPivots], [Pivot2|RemainingPadding]).
+initial_padding(pivot(chord(Key, Rna, _), _), UsedNotes, Pad, ExtraUsedNotes) :-
+    first_pad(Key, Rna, UsedNotes, Pad, ExtraUsedNotes).
 
-trailing_pad([Pivot], [Pivot, Pad]) :-
-    final_padding(Pivot, Pad).
-
-initial_padding(pivot(chord(Key, Rna, _), _), Pad) :-
-    first_pad(Key, Rna, Pad).
-
-intermediate_padding(pivot(_, chord(Key, Rna1, _)), pivot(chord(Key, Rna2, _), _), Pad) :-
-    inter_pad(Key, Rna1, Rna2, Pad).
-
-final_padding(pivot(_, chord(Key, Rna, _)), Pad) :-
-    final_pad(Key, Rna, Pad).
-
-first_pad(_, i_major, pad([])).
+first_pad(_, i_major, _, pad([]), []).
 
 first_pad(key(Note, major),
           Rna,
-          pad([chord(key(Note, major), i_major, Notes)])) :-
+          UsedNotes,
+          pad([chord(key(Note, major), i_major, Notes)]),
+          [Notes]) :-
     followed_by(i_major, Rna),
-    chord_of_key(key(Note, major), i_major, Notes).
+    chord_of_key(key(Note, major), i_major, Notes),
+    \+ member(Notes, UsedNotes).
 
 first_pad(key(Note, major),
           Rna,
+          UsedNotes,
           pad([chord(key(Note, major), i_major, Notes1),
-               chord(key(Note, major), Rna2, Notes2)])) :-
+               chord(key(Note, major), Rna2, Notes2)]),
+          [Notes1, Notes2]) :-
     followed_by(i_major, Rna2),
     followed_by(Rna2, Rna),
     chord_of_key(key(Note, major), i_major, Notes1),
-    chord_of_key(key(Note, major), Rna2, Notes2).
+    \+ member(Notes1, UsedNotes),
+    chord_of_key(key(Note, major), Rna2, Notes2),
+    \+ member(Notes2, [Notes1|UsedNotes]).
 
+trailing_pad([Pivot1, Pivot2|RemainingPivots], UsedNotes, [Pivot1, Pad, Pivot2|RemainingPadding]) :-
+    intermediate_padding(Pivot1, Pivot2, UsedNotes, Pad, ExtraUsedNotes),
+    append(UsedNotes, ExtraUsedNotes, AllUsedNotes),
+    trailing_pad([Pivot2|RemainingPivots], AllUsedNotes, [Pivot2|RemainingPadding]).
 
-inter_pad(key(_, major), Rna1, Rna2, pad([])) :-
+trailing_pad([Pivot], UsedNotes, [Pivot, Pad]) :-
+    final_padding(Pivot, UsedNotes, Pad).
+
+intermediate_padding(pivot(_, chord(Key, Rna1, _)), pivot(chord(Key, Rna2, _), _), UsedNotes, Pad, ExtraUsedNotes) :-
+    inter_pad(Key, Rna1, Rna2, UsedNotes, Pad, ExtraUsedNotes).
+
+inter_pad(key(_, major), Rna1, Rna2, _, pad([]), []) :-
     followed_by(Rna1, Rna2).
 
-inter_pad(key(Note, major), Rna1, Rna2, pad([chord(key(Note, major), IntermediateRna, Notes)])) :-
+inter_pad(key(Note, major), Rna1, Rna2, UsedNotes, pad([chord(key(Note, major), IntermediateRna, Notes)]), [Notes]) :-
     followed_by(Rna1, IntermediateRna),
     followed_by(IntermediateRna, Rna2),
-    chord_of_key(key(Note, major), IntermediateRna, Notes).
+    chord_of_key(key(Note, major), IntermediateRna, Notes),
+    \+ member(Notes, UsedNotes).
 
 inter_pad(key(Note, major),
           Rna1,
           Rna2,
+          UsedNotes,
           pad([chord(key(Note, major), IntermediateRna1, Notes1),
-               chord(key(Note, major), IntermediateRna2, Notes2)])) :-
+               chord(key(Note, major), IntermediateRna2, Notes2)]),
+          [Notes1, Notes2]) :-
     followed_by(Rna1, IntermediateRna1),
     followed_by(IntermediateRna1, IntermediateRna2),
     followed_by(IntermediateRna2, Rna2),
     chord_of_key(key(Note, major), IntermediateRna1, Notes1),
-    chord_of_key(key(Note, major), IntermediateRna2, Notes2).
+    \+ member(Notes1, UsedNotes),
+    chord_of_key(key(Note, major), IntermediateRna2, Notes2),
+    \+ member(Notes2, [Notes1|UsedNotes]).
 
-final_pad(Key, v_major, pad([chord(Key, i_major, Notes)])) :-
-    chord_of_key(Key, i_major, Notes).
+final_padding(pivot(_, chord(Key, Rna, _)), UsedNotes, Pad) :-
+    % print_message(debug, UsedNotes),
+    final_pad(Key, Rna, UsedNotes, Pad).
 
-final_pad(Key, Rna, pad([chord(Key, v_major, Notes1), chord(Key, i_major, Notes2)])) :-
+final_pad(Key, v_major, UsedNotes, pad([chord(Key, i_major, Notes)])) :-
+    chord_of_key(Key, i_major, Notes),
+    \+ member(Notes, UsedNotes).
+
+final_pad(Key, Rna, UsedNotes, pad([chord(Key, v_major, Notes1), chord(Key, i_major, Notes2)])) :-
     followed_by(Rna, v_major),
     chord_of_key(Key, v_major, Notes1),
-    chord_of_key(Key, i_major, Notes2).
+    \+ member(Notes1, UsedNotes),
+    chord_of_key(Key, i_major, Notes2),
+    \+ member(Notes2, [Notes1|UsedNotes]).
 
-final_pad(Key, Rna, pad([chord(Key, IntRna, Notes1), chord(Key, v_major, Notes2), chord(Key, i_major, Notes3)])) :-
+final_pad(Key, Rna, UsedNotes, pad([chord(Key, IntRna, Notes1), chord(Key, v_major, Notes2), chord(Key, i_major, Notes3)])) :-
     followed_by(Rna, IntRna),
     followed_by(IntRna, v_major),
     chord_of_key(Key, IntRna, Notes1),
+    \+ member(Notes1, UsedNotes),
     chord_of_key(Key, v_major, Notes2),
-    chord_of_key(Key, i_major, Notes3).
+    \+ member(Notes2, [Notes1|UsedNotes]),
+    chord_of_key(Key, i_major, Notes3),
+    \+ member(Notes3, [Notes2, Notes1|UsedNotes]).
 
 followed_by(i_major, iv_major).
 followed_by(i_major, iv_minor).
