@@ -342,6 +342,8 @@ followed_by(vii_diminished_seventh, i_major).
 followed_by(vii_diminished_seventh, iii_minor).
 followed_by(vii_diminished_seventh, vi_minor).
 
+/** simplified_sequence ********************/
+
 simplified_sequence(Sequence) :-
     padded_sequence(S),
     simplify_sequence(S, Sequence).
@@ -407,5 +409,45 @@ mode_of_chord(vi_minor, min).
 mode_of_chord(vii_diminished, dim).
 mode_of_chord(vii_diminished_seventh, dim_7).
 mode_of_chord(vii_major, maj).
+
+/** arranged_sequence ******************/
+
+arranged_sequence(Sequence) :-
+    % padded_sequence(S),
+    S = [pad([chord(key(c, major), i_major, [0, 4, 7])]), pivot(chord(key(c, major), iv_minor, [0, 5, 8]), chord(key(c_sh, major), iii_minor, [0, 5, 8])), pad([chord(key(c_sh, major), vi_minor, [1, 5, 10])]), pivot(chord(key(c_sh, major), v_major, [0, 3, 8]), chord(key(e_fl, major), iv_major, [0, 3, 8])), pad([]), pivot(chord(key(e_fl, major), i_major, [3, 7, 10]), chord(key(d, major), neapolitan_sixth, [3, 7, 10])), pad([chord(key(d, major), v_major, [1, 4, 9])]), pivot(chord(key(d, major), i_major, [2, 6, 9]), chord(key(g, major), v_major, [2, 6, 9])), pad([chord(key(g, major), i_major, [2, 7, 11])]), pivot(chord(key(g, major), vii_diminished_seventh, [0, 3, 6, 9]), chord(key(b_fl, major), vii_diminished_seventh, [0, 3, 6, 9])), pad([chord(key(b_fl, major), vi_minor, [2, 7, 10])]), pivot(chord(key(b_fl, major), ii_minor, [0, 3, 7]), chord(key(g_sh, major), iii_minor, [0, 3, 7])), pad([]), pivot(chord(key(g_sh, major), iv_minor, [1, 4, 8]), chord(key(e, major), vi_minor, [1, 4, 8])), pad([chord(key(e, major), ii_minor, [1, 6, 9]), chord(key(e, major), iv_minor, [0, 4, 9])]), pivot(chord(key(e, major), i_major, [4, 8, 11]), chord(key(b, major), iv_major, [4, 8, 11])), pad([chord(key(b, major), i_major, [3, 6, 11])]), pivot(chord(key(b, major), vii_diminished_seventh, [1, 4, 7, 10]), chord(key(f, major), vii_diminished_seventh, [1, 4, 7, 10])), pad([]), pivot(chord(key(f, major), vi_minor, [2, 5, 9]), chord(key(a, major), iv_minor, [2, 5, 9])), pad([]), pivot(chord(key(a, major), ii_minor, [2, 6, 11]), chord(key(f_sh, major), iv_minor, [2, 6, 11])), pad([chord(key(f_sh, major), v_major, [1, 5, 8]), chord(key(f_sh, major), i_major, [1, 6, 10])])],
+    filter_notes(S, Notes),
+    flatten(Notes, List),
+    arrange_first(List, Sequence).
+
+filter_notes([], []).
+
+filter_notes([pivot(Chord, _)|RemainingSequence], [Notes|RemainingNotes]) :-
+    filter_notes([Chord], Notes),
+    filter_notes(RemainingSequence, RemainingNotes).
+
+filter_notes([pad(Chords)|RemainingSequence], [Notes|RemainingNotes]) :-
+    filter_notes(Chords, Notes),
+    filter_notes(RemainingSequence, RemainingNotes).
+
+filter_notes([Chord|RemainingChords], [notes(Root, Mode)|RemainingNotes]) :-
+    simplify_chord(Chord, [Root, Mode]),
+    filter_notes(RemainingChords, RemainingNotes).
+
+% arrange the first chord
+arrange_first([Notes|RemainingNotes], [Pitches|RemainingPitches]) :-
+    arrange_first_chord(Notes, Pitches),
+    arrange_rest([Notes|RemainingNotes], [Pitches|RemainingPitches]).
+
+arrange_first_chord(notes(Root, Mode), pitches(Root, Mode)).
+
+% arrange subsequent chords, the first chord is assumed to already have been arranged
+arrange_rest([_, Notes2|RemainingNotes], [Pitches1, Pitches2|RemainingPitches]) :-
+    arrange_subsequent_chord(Pitches1, Notes2, Pitches2),
+    arrange_rest([Notes2|RemainingNotes], [Pitches2|RemainingPitches]).
+
+% terminating clause
+arrange_rest([_], [_]).
+
+arrange_subsequent_chord(_, notes(Root, Mode), pitches(Root, Mode)).
 
 % vim: ft=prolog
