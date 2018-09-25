@@ -11,58 +11,58 @@ note(9, a).
 note(10, b_fl).
 note(11, b).
 
-chord_of_major(i_major, [0, 4, 7]).
-chord_of_major(neapolitan_sixth, [1, 5, 8]).
-chord_of_major(ii_minor, [2, 5, 9]).
-chord_of_major(iii_minor, [4, 7, 11]).
-chord_of_major(iv_minor, [5, 8, 0]).
-chord_of_major(iv_major, [5, 9, 0]).
-chord_of_major(v_major, [7, 11, 2]).
-chord_of_major(v_dominant_seventh, [7, 11, 2, 5]).
-chord_of_major(italian_sixth, [8, 0, 6]).
-chord_of_major(german_sixth, [8, 0, 3, 6]).
-chord_of_major(french_sixth, [8, 0, 2, 6]).
-chord_of_major(vi_minor, [9, 0, 4]).
-chord_of_major(vii_diminished, [11, 2, 5]).
-chord_of_major(vii_diminished_seventh, [11, 2, 5, 8]).
+chord_of_c_major(i_major, [0, 4, 7]).
+chord_of_c_major(neapolitan_sixth, [1, 5, 8]).
+chord_of_c_major(ii_minor, [2, 5, 9]).
+chord_of_c_major(iii_minor, [4, 7, 11]).
+chord_of_c_major(iv_minor, [5, 8, 0]).
+chord_of_c_major(iv_major, [5, 9, 0]).
+chord_of_c_major(v_major, [7, 11, 2]).
+chord_of_c_major(v_dominant_seventh, [7, 11, 2, 5]).
+chord_of_c_major(italian_sixth, [8, 0, 6]).
+chord_of_c_major(german_sixth, [8, 0, 3, 6]).
+chord_of_c_major(french_sixth, [8, 0, 2, 6]).
+chord_of_c_major(vi_minor, [9, 0, 4]).
+chord_of_c_major(vii_diminished, [11, 2, 5]).
+chord_of_c_major(vii_diminished_seventh, [11, 2, 5, 8]).
 
-chord_of_minor(i_minor, [0, 3, 7]).
-chord_of_minor(neapolitan_sixth, [1, 5, 8]).
-chord_of_minor(ii_diminished, [2, 5, 8]).
-chord_of_minor(ii_diminished_seventh, [2, 5, 8, 11]).
-chord_of_minor(ii_minor, [2, 5, 9]).
-chord_of_minor(iii_major, [3, 7, 10]).
-chord_of_minor(iii_augmented, [3, 7, 11]).
-chord_of_minor(iv_minor, [5, 8, 0]).
-chord_of_minor(iv_major, [5, 9, 0]).
-chord_of_minor(v_minor, [7, 10, 2]).
-chord_of_minor(v_major, [7, 11, 2]).
-chord_of_minor(v_dominant_seventh, [7, 11, 2, 5]).
-chord_of_minor(italian_sixth, [8, 0, 6]).
-chord_of_minor(german_sixth, [8, 0, 3, 6]).
-chord_of_minor(french_sixth, [8, 0, 2, 6]).
-chord_of_minor(vi_major, [8, 0, 3]).
-chord_of_minor(vi_diminished, [9, 0, 3]).
-chord_of_minor(vi_diminished_seventh, [9, 0, 3, 6]).
-chord_of_minor(vii_major, [10, 2, 5]).
-chord_of_minor(vii_diminished, [11, 2, 5]).
-chord_of_minor(vii_diminished_seventh, [11, 2, 5, 8]).
+chord_of_c_minor(i_minor, [0, 3, 7]).
+chord_of_c_minor(neapolitan_sixth, [1, 5, 8]).
+chord_of_c_minor(ii_diminished, [2, 5, 8]).
+chord_of_c_minor(ii_diminished_seventh, [2, 5, 8, 11]).
+chord_of_c_minor(ii_minor, [2, 5, 9]).
+chord_of_c_minor(iii_major, [3, 7, 10]).
+chord_of_c_minor(iii_augmented, [3, 7, 11]).
+chord_of_c_minor(iv_minor, [5, 8, 0]).
+chord_of_c_minor(iv_major, [5, 9, 0]).
+chord_of_c_minor(v_minor, [7, 10, 2]).
+chord_of_c_minor(v_major, [7, 11, 2]).
+chord_of_c_minor(v_dominant_seventh, [7, 11, 2, 5]).
+chord_of_c_minor(italian_sixth, [8, 0, 6]).
+chord_of_c_minor(german_sixth, [8, 0, 3, 6]).
+chord_of_c_minor(french_sixth, [8, 0, 2, 6]).
+chord_of_c_minor(vi_major, [8, 0, 3]).
+chord_of_c_minor(vi_diminished, [9, 0, 3]).
+chord_of_c_minor(vi_diminished_seventh, [9, 0, 3, 6]).
+chord_of_c_minor(vii_major, [10, 2, 5]).
+chord_of_c_minor(vii_diminished, [11, 2, 5]).
+chord_of_c_minor(vii_diminished_seventh, [11, 2, 5, 8]).
 
-pivot_chord(Key1, Key2, pivot(chord(Key1, Name1), chord(Key2, Name2), Notes)) :-
-    chord_of_key(Key1, Name1, Notes),
-    chord_of_key(Key2, Name2, Notes).
+pivot_chord(Key1, Key2, pivot(chord(Key1, Rna1, Notes), chord(Key2, Rna2, Notes))) :-
+    chord_of_key(Key1, Rna1, Notes),
+    chord_of_key(Key2, Rna2, Notes).
 
-chord_of_key(key(Pitch, major), Name, Notes) :- chord_of_major_key(Pitch, Name, Notes).
-chord_of_key(key(Pitch, minor), Name, Notes) :- chord_of_minor_key(Pitch, Name, Notes).
+chord_of_key(key(Pitch, major), Rna, Notes) :- chord_of_major_key(Pitch, Rna, Notes).
+chord_of_key(key(Pitch, minor), Rna, Notes) :- chord_of_minor_key(Pitch, Rna, Notes).
 
 chord_of_major_key(Pitch, Name, Notes) :-
     note(Offset, Pitch),
-    chord_of_major(Name , OriginalNotes),
+    chord_of_c_major(Name , OriginalNotes),
     offset_chord(Offset, OriginalNotes, Notes).
 
 chord_of_minor_key(Pitch, Name, Notes) :-
     note(Offset, Pitch),
-    chord_of_minor(Name, OriginalNotes),
+    chord_of_c_minor(Name, OriginalNotes),
     offset_chord(Offset, OriginalNotes, Notes).
 
 offset_chord(Offset, OriginalNotes, Notes) :-
@@ -149,44 +149,66 @@ trailing_pad([Pivot1, Pivot2|RemainingPivots], [Pivot1, Pad, Pivot2|RemainingPad
 trailing_pad([Pivot], [Pivot, Pad]) :-
     final_padding(Pivot, Pad).
 
-initial_padding(pivot(chord(Key, Chord), _, _), Pad) :-
-    first_pad(Key, Chord, Pad).
+initial_padding(pivot(chord(Key, Rna, _), _), Pad) :-
+    first_pad(Key, Rna, Pad).
 
-intermediate_padding(pivot(_, chord(Key, Chord1), _), pivot(chord(Key, Chord2), _, _), Pad) :-
-    inter_pad(Key, Chord1, Chord2, Pad).
+intermediate_padding(pivot(_, chord(Key, Rna1, _)), pivot(chord(Key, Rna2, _), _), Pad) :-
+    inter_pad(Key, Rna1, Rna2, Pad).
 
-final_padding(pivot(_, chord(Key, Chord), _), Pad) :-
-    final_pad(Key, Chord, Pad).
+final_padding(pivot(_, chord(Key, Rna, _)), Pad) :-
+    final_pad(Key, Rna, Pad).
 
 first_pad(_, i_major, pad([])).
 
-first_pad(key(Key, major), Chord, pad([chord(key(Key, major), i_major)])) :-
-    followed_by(i_major, Chord).
+first_pad(key(Note, major),
+          Rna,
+          pad([chord(key(Note, major), i_major, Notes)])) :-
+    followed_by(i_major, Rna),
+    chord_of_key(key(Note, major), i_major, Notes).
 
-first_pad(key(Key, major), Chord, pad([chord(key(Key, major), i_major), chord(Key, major), Chord2])) :-
-    followed_by(i_major, Chord2),
-    followed_by(Chord2, Chord).
+first_pad(key(Note, major),
+          Rna,
+          pad([chord(key(Note, major), i_major, Notes1),
+               chord(key(Note, major), Rna2, Notes2)])) :-
+    followed_by(i_major, Rna2),
+    followed_by(Rna2, Rna),
+    chord_of_key(key(Note, major), i_major, Notes1),
+    chord_of_key(key(Note, major), Rna2, Notes2).
 
-inter_pad(key(_, major), Chord1, Chord2, pad([])) :-
-    followed_by(Chord1, Chord2).
 
-inter_pad(key(Key, major), Chord1, Chord2, pad([chord(key(Key, major), IntermediateChord)])) :-
-    followed_by(Chord1, IntermediateChord),
-    followed_by(IntermediateChord, Chord2).
+inter_pad(key(_, major), Rna1, Rna2, pad([])) :-
+    followed_by(Rna1, Rna2).
 
-inter_pad(key(Key, major), Chord1, Chord2, pad([chord(key(Key, major), IntermediateChord1), chord(key(Key, major), IntermediateChord2)])) :-
-    followed_by(Chord1, IntermediateChord1),
-    followed_by(IntermediateChord1, IntermediateChord2),
-    followed_by(IntermediateChord2, Chord2).
+inter_pad(key(Note, major), Rna1, Rna2, pad([chord(key(Note, major), IntermediateRna, Notes)])) :-
+    followed_by(Rna1, IntermediateRna),
+    followed_by(IntermediateRna, Rna2),
+    chord_of_key(key(Note, major), IntermediateRna, Notes).
 
-final_pad(Key, v_major, pad([chord(Key, i_major)])).
+inter_pad(key(Note, major),
+          Rna1,
+          Rna2,
+          pad([chord(key(Note, major), IntermediateRna1, Notes1),
+               chord(key(Note, major), IntermediateRna2, Notes2)])) :-
+    followed_by(Rna1, IntermediateRna1),
+    followed_by(IntermediateRna1, IntermediateRna2),
+    followed_by(IntermediateRna2, Rna2),
+    chord_of_key(key(Note, major), IntermediateRna1, Notes1),
+    chord_of_key(key(Note, major), IntermediateRna2, Notes2).
 
-final_pad(Key, Chord, pad([chord(Key, v_major), chord(Key, i_major)])) :-
-    followed_by(Chord, v_major).
+final_pad(Key, v_major, pad([chord(Key, i_major, Notes)])) :-
+    chord_of_key(Key, i_major, Notes).
 
-final_pad(Key, Chord, pad([chord(Key, IntChord), chord(Key, v_major), chord(Key, i_major)])) :-
-    followed_by(Chord, IntChord),
-    followed_by(IntChord, v_major).
+final_pad(Key, Rna, pad([chord(Key, v_major, Notes1), chord(Key, i_major, Notes2)])) :-
+    followed_by(Rna, v_major),
+    chord_of_key(Key, v_major, Notes1),
+    chord_of_key(Key, i_major, Notes2).
+
+final_pad(Key, Rna, pad([chord(Key, IntRna, Notes1), chord(Key, v_major, Notes2), chord(Key, i_major, Notes3)])) :-
+    followed_by(Rna, IntRna),
+    followed_by(IntRna, v_major),
+    chord_of_key(Key, IntRna, Notes1),
+    chord_of_key(Key, v_major, Notes2),
+    chord_of_key(Key, i_major, Notes3).
 
 followed_by(i_major, iv_major).
 followed_by(i_major, iv_minor).
@@ -303,7 +325,7 @@ simplify_sequence([H|T], [S|U]) :-
 simplify(pad(Chords), SimplifiedChords) :-
     simplify_chords(Chords, SimplifiedChords).
 
-simplify(pivot(Chord, _, _), SimplifiedChord) :-
+simplify(pivot(Chord, _), SimplifiedChord) :-
     simplify_chord(Chord, SimplifiedChord).
 
 simplify_chords([], []).
@@ -312,16 +334,16 @@ simplify_chords([H|T], [S|U]) :-
     simplify_chord(H, S),
     simplify_chords(T, U).
 
-simplify_chord(chord(Key, Name), [Root, Mode]) :-
-    offset_of_name(Name, Offset),
+simplify_chord(chord(Key, Rna, _), [Root, Mode]) :-
+    offset_of_name(Rna, Offset),
     root_of_chord(Key, Offset, Root),
-    mode_of_chord(Name, Mode).
+    mode_of_chord(Rna, Mode).
 
 offset_of_name(Name, Offset) :-
-    chord_of_major(Name, [Offset|_]), !.
+    chord_of_c_major(Name, [Offset|_]), !.
 
 offset_of_name(Name, Offset) :-
-    chord_of_minor(Name, [Offset|_]).
+    chord_of_c_minor(Name, [Offset|_]).
 
 root_of_chord(key(Note, _), Offset, Root) :-
     note(Pitch, Note),
