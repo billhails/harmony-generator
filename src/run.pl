@@ -30,4 +30,10 @@
 :- use_module(harmony(pivot_chords)).
 :- use_module(harmony(padding)).
 
+% load this file then do:
+%
+% key_chain(KEYS),
+% pivot_chords(KEYS, PIVOTS),
+% padding(PIVOTS, PADDED).
+
 % vim: ft=prolog

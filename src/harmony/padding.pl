@@ -15,12 +15,12 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-:- module(padding, [padding_chords/2]).
+:- module(padding, [padding/2]).
 
 :- use_module(harmony(sequences)).
 :- use_module(harmony(chords)).
 
-padding_chords([Pivot|RemainingPivots], [Pad, Pivot|RemainingPadded]) :-
+padding([Pivot|RemainingPivots], [Pad, Pivot|RemainingPadded]) :-
     initial_padding(Pivot, Pad),
     trailing_pad([Pivot|RemainingPivots], [Pivot|RemainingPadded]).
 
