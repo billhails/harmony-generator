@@ -7,8 +7,11 @@ Each module is intended to take the output of a previous module and rewrite it i
 The intention is to be able to pick and mix later modules, relying on a common intermediate format but at the
 moment each module is more or less tied to the format of the previous module's output.
 
-## Directory Layout
+The plan is to add modules that will do voice placement (SATB ranges,) voice leading (inversions, common notes,
+suspensions, anticipations and passing tones,) validation (disallow parallel fifths etc.) and finally output
+to MusicXML that can be directly imported into notation software like Sibelius or MuseScore.
 
+## Directory Layout
 * `src/run.pl` - top level loader.
 * `src/original.pl` - an early attempt, all code in one file, kept for reference.
 * `src/harmony/` - the library.
