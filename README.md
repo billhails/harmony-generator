@@ -9,6 +9,12 @@ moment each module is more or less tied to the format of the previous module's o
 
 ## Directory Layout
 
-* `src/run.pl` - top level pipeline.
+* `src/run.pl` - top level loader.
 * `src/original.pl` - an early attempt, all code in one file, kept for reference.
-* `src/harmony/` - the library
+* `src/harmony/` - the library.
+* `src/harmony/chords.pl` - utility, calculates notes of chord.
+* `src/harmony/key_chain.pl` - pipeline, generates a sequence of keys.
+* `src/harmony/note.pl` - utility, map note names to numbers.
+* `src/harmony/padding.pl` - pipeline, takes sequence of pivot chords and adds padding chords.
+* `src/harmony/pivot_chords.pl` - pipeline, takes sequence of keys and produces sequence of pivot chords.
+* `src/harmony/sequences.pl` - utility, common chord sequences for padding.
