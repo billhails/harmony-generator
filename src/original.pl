@@ -495,10 +495,11 @@ arrange([Chord|RemainingChords], [SATB|RemainingSATB]) :-
     arrange_first(Chord, SATB),
     arrange_rest([Chord|RemainingChords], [SATB|RemainingSATB]).
 
-arrange_first(chord(Key, RNA, Notes), SATB) :-
-    arrange_first_chord(chord(Key, RNA, Notes), SATB).
+extract_chord(chord(Key, RNA, Notes), chord(Key, RNA, Notes)).
+extract_chord(pivot(chord(Key, RNA, Notes)), chord(Key, RNA, Notes)).
 
-arrange_first(pivot(Chord, _), SATB) :-
+arrange_first(C, SATB) :-
+    extract_chord(C, Chord),
     arrange_first_chord(Chord, SATB).
 
 arrange_first_chord(chord(Key, RNA, _), satb(Key, S, A, T, B)) :-
@@ -511,9 +512,21 @@ arrange_first_chord(chord(Key, RNA, _), satb(Key, S, A, T, B)) :-
 
 arrange_rest([_], [_]).
 
-arrange_rest([_,Chord2|RemainingChords], [_,SATB2|RemainingSATB]) :-
-    arrange_first(Chord2, SATB2),
+arrange_rest([Chord1,Chord2|RemainingChords], [SATB1,SATB2|RemainingSATB]) :-
+    arrange_next(Chord1, SATB1, Chord2, SATB2),
     arrange_rest([Chord2|RemainingChords], [SATB2|RemainingSATB]).
+
+arrange_next(C1, SATB1, C2, SATB2) :-
+    extract_chord(C1, Chord1),
+    extract_chord(C2, Chord2),
+    arrange_next_chord(Chord1, SATB1, Chord2, SATB2).
+
+arrange_next_chord(Chord1, SATB1, Chord2, SATB2) :-
+    notes_in_common(Chord1, Chord2, CommonNotes),
+    arrange_first_chord(Chord2, SATB2).
+
+notes_in_common(chord(_, _, Notes1), chord(_, _, Notes2), CommonNotes) :-
+    intersection(Notes1, Notes2, CommonNotes).
 
 root_of_chord_by_rna(Key, RNA, Root) :-
     root_pitch_of_chord(Key, RNA, Pitch),
