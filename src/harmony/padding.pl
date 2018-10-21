@@ -20,7 +20,11 @@
 :- use_module(harmony(sequences)).
 :- use_module(harmony(chords)).
 
-padding([Pivot|RemainingPivots], [Pad, Pivot|RemainingPadded]) :-
+padding(Pivots, Padded) :-
+    padded_sequence(Pivots, P),
+    unpack_padding(P, Padded).
+
+padded_sequence([Pivot|RemainingPivots], [Pad, Pivot|RemainingPadded]) :-
     initial_padding(Pivot, Pad),
     trailing_pad([Pivot|RemainingPivots], [Pivot|RemainingPadded]).
 
@@ -99,5 +103,13 @@ final_pad(Key, RNA, pad([chord(Key, IntRna, Notes1), chord(Key, v_major, Notes2)
     chord_of_key(Key, v_major, Notes2),
     chord_of_key(Key, i_major, Notes3).
 
+unpack_padding([], []).
+
+unpack_padding([pivot(Chord1, Chord2)|ToUnpack], [pivot(Chord1, Chord2)|Unpacked]) :-
+    unpack_padding(ToUnpack, Unpacked).
+
+unpack_padding([pad(Chords)|ToUnpack], Unpacked) :-
+    unpack_padding(ToUnpack, Rest),
+    append(Chords, Rest, Unpacked).
 
 % vim: ft=prolog

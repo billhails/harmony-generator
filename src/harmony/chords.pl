@@ -15,7 +15,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-:- module(chords, [chord_of_key/3]).
+:- module(chords, [chord_of_key/3, root_of_chord_by_rna/3, mode_of_chord/2]).
 
 :- use_module(harmony(note)).
 
@@ -28,12 +28,12 @@ chord_of_key(key(KeyNote, minor), RNA, Notes) :-
     sort(OffsetNotes, Notes).
 
 chord_of_major_key(KeyNote, RNA, Notes) :-
-    note:note(Offset, KeyNote),
+    note(Offset, KeyNote),
     chord_of_c_major(RNA , OriginalNotes),
     offset_chord(Offset, OriginalNotes, Notes).
 
 chord_of_minor_key(KeyNote, RNA, Notes) :-
-    note:note(Offset, KeyNote),
+    note(Offset, KeyNote),
     chord_of_c_minor(RNA, OriginalNotes),
     offset_chord(Offset, OriginalNotes, Notes).
 
@@ -82,5 +82,69 @@ chord_of_c_minor(vi_diminished_seventh, [9, 0, 3, 6]).
 chord_of_c_minor(vii_major, [10, 2, 5]).
 chord_of_c_minor(vii_diminished, [11, 2, 5]).
 chord_of_c_minor(vii_diminished_seventh, [11, 2, 5, 8]).
+
+root_pitch_of_chord(key(KeyNote, major), RNA, Root) :-
+    chord_of_major_key(KeyNote, RNA, [Root|_]).
+
+root_pitch_of_chord(key(KeyNote, minor), RNA, Root) :-
+    chord_of_minor_key(KeyNote, RNA, [Root|_]).
+
+root_pitch_of_chord(key(KeyNote, major), RNA, Root) :-
+    chord_of_major_key(KeyNote, RNA, [Root|_]).
+
+root_pitch_of_chord(key(KeyNote, minor), RNA, Root) :-
+    chord_of_minor_key(KeyNote, RNA, [Root|_]).
+
+root_of_chord_by_rna(Key, RNA, Root) :-
+    root_pitch_of_chord(Key, RNA, Pitch),
+    note(Pitch, Root).
+
+mode_of_chord(french_sixth, fr_6).
+mode_of_chord(german_sixth, ger_6).
+mode_of_chord(i_major, maj).
+mode_of_chord(i_minor, min).
+mode_of_chord(ii_diminished, dim).
+mode_of_chord(ii_diminished_seventh, dim_7).
+mode_of_chord(ii_minor, min).
+mode_of_chord(iii_augmented, aug).
+mode_of_chord(iii_major, maj).
+mode_of_chord(iii_minor, min).
+mode_of_chord(italian_sixth, it_6).
+mode_of_chord(iv_major, maj).
+mode_of_chord(iv_minor, min).
+mode_of_chord(neapolitan_sixth, maj_b).
+mode_of_chord(v_dominant_seventh, dom_7).
+mode_of_chord(v_major, maj).
+mode_of_chord(v_minor, min).
+mode_of_chord(vi_diminished, dim).
+mode_of_chord(vi_diminished_seventh, dim_7).
+mode_of_chord(vi_major, maj).
+mode_of_chord(vi_minor, min).
+mode_of_chord(vii_diminished, dim).
+mode_of_chord(vii_diminished_seventh, dim_7).
+mode_of_chord(vii_major, maj).
+
+notes_of_chord(Root, ChordType, Notes) :-
+    offsets_of_chord(ChordType, Offsets),
+    add_offsets_to_root(Root, Offsets, Notes).
+
+offsets_of_chord(aug, [0, 4, 8]).
+offsets_of_chord(it_6, [0, 4, 10]).
+offsets_of_chord(ger_6, [0, 4, 7, 10]).
+offsets_of_chord(fr_6, [0, 4, 6, 10]).
+offsets_of_chord(dim, [0, 3, 6]).
+offsets_of_chord(dim_7, [0, 3, 6, 9]).
+offsets_of_chord(dom_7, [0, 4, 7, 10]).
+offsets_of_chord(maj, [0, 4, 7]).
+offsets_of_chord(maj_b, [0, 3, 8]).
+offsets_of_chord(min, [0, 3, 7]).
+
+add_offsets_to_root(_, [], []).
+
+add_offsets_to_root(Root, [Offset|Offsets], [Note|Notes]) :-
+    note(Position, Root),
+    OffsetPosition is (Position + Offset) mod 12,
+    note(OffsetPosition, Note),
+    add_offsets_to_root(Root, Offsets, Notes).
 
 % vim: ft=prolog

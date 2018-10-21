@@ -100,12 +100,6 @@ add_offset(Offset, [X|T], [Y|U]) :-
     Y is (X + Offset) mod 12,
     add_offset(Offset, T, U).
 
-note_names([], []).
-
-note_names([X|T], [Y|U]) :-
-    note(X, Y),
-    note_names(T, U).
-
 /** key_chain ********************/
 
 key_chain(Chain) :-

@@ -25,7 +25,6 @@
                      spacing(next_argument)
                    ]).
 
-:- use_module(library(clpfd)).
 :- use_module(harmony(key_chain)).
 :- use_module(harmony(pivot_chords)).
 :- use_module(harmony(padding)).

@@ -18,6 +18,7 @@
 :- module(key_chain, [key_chain/1]).
 
 :- use_module(harmony(note)).
+:- use_module(library(random)).
 
 key_chain(Chain) :-
     key_chain([c, g, d, a, e, b, f_sh, c_sh, g_sh, e_fl, b_fl, f],
@@ -26,8 +27,9 @@ key_chain(Chain) :-
 
 key_chain([], [], _).
 
-key_chain(AvailableKeys, AvailableIntervals, [key(KeyNote, Mode)|[key(PrevKeyNote, PrevMode)|Chain]]) :-
-    member(KeyNote, AvailableKeys),
+key_chain(AvailableKeys, AvailableIntervals, [key(KeyNote, Mode), key(PrevKeyNote, PrevMode)|Chain]) :-
+    random_permutation(AvailableKeys, ShuffledKeys),
+    member(KeyNote, ShuffledKeys),
     note:note(Offset, KeyNote),
     note:note(PrevOffset, PrevKeyNote),
     interval(Offset, PrevOffset, Interval),
@@ -38,7 +40,7 @@ key_chain(AvailableKeys, AvailableIntervals, [key(KeyNote, Mode)|[key(PrevKeyNot
     key_chain(RemainingKeys, RemainingIntervals, [key(PrevKeyNote, PrevMode)|Chain]).
 
 key_chain(AvailableKeys, AvailableIntervals, [key(KeyNote, Mode)]) :-
-    member(KeyNote, AvailableKeys),
+    random_member(KeyNote, AvailableKeys),
     delete(AvailableKeys, KeyNote, RemainingKeys),
     random_mode(Mode),
     key_chain(RemainingKeys, AvailableIntervals, []).
